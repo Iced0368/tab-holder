@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Holder",
+  "version": "1.0",
+  "permissions": [
+    "storage",
+    "tabs",
+    "notifications"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "commands": {
+    "queue_tab": {
+      "suggested_key": {
+        "default": "Ctrl+Q"
+      },
+      "description": "Queue the current tab"
+    },
+    "pop_tab": {
+      "suggested_key": {
+        "default": "Ctrl+I"
+      },
+      "description": "Pop and open the next tab in the queue"
+    },
+    "debug": {
+      "suggested_key": {
+        "default": "Ctrl+End"
+      },
+      "description": "Log storage data to console"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

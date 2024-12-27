@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tab Holder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      height: 500px;
+      width: 300px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tab-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      justify-content: space-between;
+    }
+    .tab-title {
+      flex-grow: 1;
+      margin-left: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tab-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
+    }
+    .icon-button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      margin: 0px;
+    }
+    .icon-button img {
+      width: 24px;
+      height: 24px;
+    }
+    .queue-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .queue-select {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+    .modal {
+      display: none; 
+      position: fixed;
+      z-index: 1; 
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; 
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto; 
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 300px;
+      border-radius: 10px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .toggle-label {
+      font-size: 14px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 20px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    .divider {
+      width: 100%;
+      margin-top: 0px;
+      margin-bottom: 10px;
+      color: #888;
+    }
+    .button-container {
+      display: flex;
+      margin-left: auto;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(14px);
+    }
+    .remove-tab {
+      color: red;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    #tabList {
+      flex-grow: 1;
+      overflow-y: auto;  /* tabList의 스크롤을 활성화합니다 */
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Tab Holder</h1>
+    <div class="button-container">
+      <button class="icon-button" id="infoButton">
+        <img src="icons/info-icon.png" alt="Info">
+      </button>
+      <button class="icon-button" id="settingsButton">
+        <img src="icons/settings-icon.png" alt="Settings">
+      </button>
+    </div>
+  </div>
+  
+  <hr class="divider">
+
+  <div class="queue-container">
+    <select id="queueSelect" class="queue-select"></select>
+
+    <div class="button-container">
+      <button class="icon-button" id="clearQueue">
+        <img src="icons/trash-icon.png" alt="Clear Queue">
+      </button>
+      <button class="icon-button" id="secretToggle" style="display: none;">
+        <img src="icons/secret-off-icon.png" alt="Secret Toggle">
+      </button>
+      <button class="icon-button" id="addQueue">
+        <img src="icons/add-icon.png" alt="Add Queue">
+      </button>
+    </div>
+  </div>
+  <div id="tabList"></div>
+  <!-- The Modal -->
+
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <h2>Quick Guide</h2>
+      <p><strong>Queue a Tab:</strong></p>
+      <ul>
+        <li><strong>Shortcut:</strong> Press <kbd>Ctrl+Q</kbd> to queue the current tab.</li>
+        <li><strong>Popup:</strong> Click the Tab Holder icon, select a queue, and press the add button (+) to queue.</li>
+      </ul>
+      <p><strong>Pop a Tab:</strong></p>
+      <ul>
+        <li><strong>Shortcut:</strong> Press <kbd>Ctrl+I</kbd> to open the next tab in the queue.</li>
+        <li><strong>Popup:</strong> Click a tab in the list to open it.</li>
+      </ul>
+      <p><strong>Manage Queues:</strong></p>
+      <ul>
+        <li><strong>Switch Queues:</strong> Use the dropdown menu to select different queues.</li>
+        <li><strong>Create a Queue:</strong> Click the add button (+) and enter a name.</li>
+        <li><strong>Delete a Queue:</strong> Select a queue and click the trash icon.</li>
+      </ul>
+      <p><strong>Secret Queues:</strong></p>
+      <ul>
+        <li><strong>Secret Queue:</strong> Secret Queues are only visible in the incognito mode of Chrome.</li>
+        <li><strong>Toggle Secret:</strong> In incognito mode, click the secret toggle button to mark a queue as secret.</li>
+      </ul>
+      <p><strong>Settings:</strong></p>
+      <ul>
+        <li><strong>Open Settings:</strong> Click the settings icon.</li>
+        <li><strong>Notifications:</strong> Toggle notifications on or off.</li>
+        <li><strong>Shortcuts:</strong> Enable or disable keyboard shortcuts.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="toggle-container">
+        <span class="toggle-label">Notifications</span>
+        <label class="switch">
+          <input type="checkbox" id="notificationToggle">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="toggle-container">
+        <span class="toggle-label">Shortcuts</span>
+        <label class="switch">
+          <input type="checkbox" id="shortcutToggle">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="Sortable.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
